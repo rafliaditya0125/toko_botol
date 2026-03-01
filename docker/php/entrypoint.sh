@@ -28,7 +28,7 @@ date_default_timezone_set('Asia/Jakarta');
 \$conn = new mysqli(\$host, \$user, \$pass, \$dbname);
 if (\$conn->connect_error) { die("Koneksi gagal: " . \$conn->connect_error); }
 
-\$base_url = '${APP_URL:-http://localhost}/';
+\$root = '${APP_URL:-http://localhost}/';
 PHPEOF
 
 echo "🎉 Application ready!"
