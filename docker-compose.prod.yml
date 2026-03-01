@@ -3,7 +3,7 @@
 
 services:
   nginx:
-    image: nginx:alpine
+    image: ${NGINX_IMAGE}
     container_name: toko_nginx
     restart: unless-stopped
     ports:

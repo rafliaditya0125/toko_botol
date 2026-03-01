@@ -7,6 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  # Ini akan jadi ghcr.io/username/repo
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
@@ -30,35 +31,36 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
+      # 1. BUILD & PUSH PHP (MAIN APP)
+      - name: Extract metadata for PHP
+        id: meta-php
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=
             type=raw,value=latest
 
-      - name: Build and push main app
+      - name: Build and push PHP
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-php.outputs.tags }}
+          labels: ${{ steps.meta-php.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Extract metadata for backup
+      # 2. BUILD & PUSH BACKUP
+      - name: Extract metadata for Backup
         id: meta-backup
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_NAME }}-backup
           tags: |
-            type=sha,prefix=
             type=raw,value=latest
 
-      - name: Build and push backup
+      - name: Build and push Backup
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -66,5 +68,25 @@ jobs:
           push: true
           tags: ${{ steps.meta-backup.outputs.tags }}
           labels: ${{ steps.meta-backup.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # 3. BUILD & PUSH NGINX
+      - name: Extract metadata for Nginx
+        id: meta-nginx
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}-nginx
+          tags: |
+            type=raw,value=latest
+
+      - name: Build and push Nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta-nginx.outputs.tags }}
+          labels: ${{ steps.meta-nginx.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
