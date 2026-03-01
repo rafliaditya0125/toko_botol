@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - app_data:/var/www/html
+      - ./:/var/www/html
     depends_on:
       - php
     networks:
@@ -17,7 +17,7 @@ services:
     container_name: toko_php
     restart: unless-stopped
     volumes:
-      - app_data:/var/www/html
+      - ./:/var/www/html
     env_file:
       - .env
     environment:
