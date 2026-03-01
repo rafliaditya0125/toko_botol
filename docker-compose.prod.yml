@@ -16,7 +16,7 @@ services:
       - toko_network
 
   php:
-    image: ${DOCKER_IMAGE:-ghcr.io/rafliaditya0125/toko_botol:latest}
+    image: ${DOCKER_IMAGE}
     container_name: toko_php
     restart: unless-stopped
     volumes:
@@ -50,7 +50,7 @@ services:
       - toko_network
 
   backup:
-    image: ${BACKUP_IMAGE:-ghcr.io/rafliaditya0125/toko_botol-backup:latest}
+    image: ${BACKUP_IMAGE}
     container_name: toko_backup
     restart: unless-stopped
     volumes:
