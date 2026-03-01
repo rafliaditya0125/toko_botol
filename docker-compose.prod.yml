@@ -1,6 +1,3 @@
-# Production docker-compose — uses pre-built image from registry
-# Server only needs: docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d
-
 services:
   nginx:
     image: ${NGINX_IMAGE}
@@ -23,6 +20,8 @@ services:
       - app_data:/var/www/html
     env_file:
       - .env
+    environment:
+      - DB_HOST=db  # Memaksa host ke nama service database
     depends_on:
       db:
         condition: service_healthy
@@ -30,7 +29,7 @@ services:
       - toko_network
 
   db:
-    image: mariadb:10.11  # Gunakan versi LTS (Debian based lebih stabil untuk prod)
+    image: mariadb:10.11
     container_name: toko_mariadb
     restart: unless-stopped
     environment:
@@ -40,8 +39,9 @@ services:
       - .env
     volumes:
       - db_data:/var/lib/mysql
+      # OTOMATIS IMPORT SQL DUMP SAAT PERTAMA KALI JALAN
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      # Menggunakan mysqladmin lebih aman daripada healthcheck.sh di berbagai OS
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${DB_PASS} || exit 1"]
       interval: 10s
       timeout: 5s
@@ -58,6 +58,10 @@ services:
     env_file:
       - .env
     environment:
+      - DB_HOST=db  # Harus arahkan ke container database
+      - DB_USER=root
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
     depends_on:
@@ -70,7 +74,7 @@ volumes:
   db_data:
   app_data:
 
-
 networks:
   toko_network:
     driver: bridge
+    name: toko_network  # Mengunci nama agar tidak ditambah prefix folder (pdk_...)
