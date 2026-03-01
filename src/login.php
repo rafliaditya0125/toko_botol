@@ -114,11 +114,6 @@ $cabang = query("SELECT * FROM cabang");
                     </button>
                 </form>
             </div>
-            
-            <div class="mt-8 text-center text-sm text-gray-500">
-                <p>⚠️ Untuk demo: Admin (admin / @admin123)</p>
-                <p>Kasir (cukup isi nama & cabang)</p>
-            </div>
         </div>
     </div>
     
